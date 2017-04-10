@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:encryption="http://www.mulesoft.org/schema/mule/encryption" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/encryption http://www.mulesoft.org/schema/mule/encryption/current/mule-encryption.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8081" doc:name="HTTP Listener Configuration"/>
+    <encryption:config name="Tirapa_PGP_Encryption" defaultEncrypter="PGP_ENCRYPTER" doc:name="Encryption">
+        <encryption:pgp-encrypter-config publicKeyRingFileName="./pubring.gpg"  secretAliasId="8073420915809300484" secretPassphrase="Aparitreddy22" secretKeyRingFileName="./secring.gpg"/>
+    </encryption:config>
+    <flow name="samplePGPEncryptionExamplesFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/encrypt" doc:name="HTTP"/>
+        <set-payload value="#[message.inboundProperties.'http.query.params'.sample]" doc:name="Set Payload" />
+        <object-to-byte-array-transformer doc:name="Object to Byte Array"/>
+        <encryption:encrypt config-ref="Tirapa_PGP_Encryption" using="PGP_ENCRYPTER" doc:name="Tirapa_PGP_Encryption">
+        
+        <encryption:pgp-encrypter principal="Tirapa Reddy Tondapu &lt;tirapareddy.tondapu@eidiko.com&gt;" />
+        </encryption:encrypt>
+        <logger message="Print Encrypted Message #[payload]" level="INFO" doc:name="Logger"/>
+        <encryption:decrypt config-ref="Tirapa_PGP_Encryption" doc:name="Encryption">
+            <encryption:pgp-encrypter principal="mulereal (mulereal) &lt;tirapareddy.tondapu@eidiko.com&gt;"/>
+        </encryption:decrypt>
+    </flow>
+</mule>
