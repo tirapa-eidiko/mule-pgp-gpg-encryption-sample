@@ -13,17 +13,21 @@ http://www.mulesoft.org/schema/mule/encryption http://www.mulesoft.org/schema/mu
     <encryption:config name="Tirapa_PGP_Encryption" defaultEncrypter="PGP_ENCRYPTER" doc:name="Encryption">
         <encryption:pgp-encrypter-config publicKeyRingFileName="./pubring.gpg"  secretAliasId="8073420915809300484" secretPassphrase="Aparitreddy22" secretKeyRingFileName="./secring.gpg"/>
     </encryption:config>
+    <encryption:config name="Tirapa_PGP_Decryptin" defaultEncrypter="PGP_ENCRYPTER" doc:name="Encryption">
+        <encryption:pgp-encrypter-config publicKeyRingFileName="./pubring.gpg" secretKeyRingFileName="./secring.gpg" secretAliasId="-5703911420231159376" secretPassphrase="Aparitreddy22" principal="mulereal (mulereal) &lt;tirapareddy.tondapu@eidiko.com&gt;"/>
+    </encryption:config>
     <flow name="samplePGPEncryptionExamplesFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/encrypt" doc:name="HTTP"/>
         <set-payload value="#[message.inboundProperties.'http.query.params'.sample]" doc:name="Set Payload" />
-        <object-to-byte-array-transformer doc:name="Object to Byte Array"/>
+        <logger message="Original Message #[message.payloadAs(java.lang.String)]" level="INFO" doc:name="Logger"/>
         <encryption:encrypt config-ref="Tirapa_PGP_Encryption" using="PGP_ENCRYPTER" doc:name="Tirapa_PGP_Encryption">
         
         <encryption:pgp-encrypter principal="Tirapa Reddy Tondapu &lt;tirapareddy.tondapu@eidiko.com&gt;" />
         </encryption:encrypt>
-        <logger message="Print Encrypted Message #[payload]" level="INFO" doc:name="Logger"/>
-        <encryption:decrypt config-ref="Tirapa_PGP_Encryption" doc:name="Encryption">
+        <logger message="Encrypted Message #[message.payloadAs(java.lang.String)]" level="INFO" doc:name="Logger"/>
+        <encryption:decrypt config-ref="Tirapa_PGP_Decryptin" doc:name="Tirapa_PGP_Decreption">
             <encryption:pgp-encrypter principal="mulereal (mulereal) &lt;tirapareddy.tondapu@eidiko.com&gt;"/>
         </encryption:decrypt>
+        <logger message="Decrypted Message #[message.payloadAs(java.lang.String)]" level="INFO" doc:name="Logger"/>
     </flow>
 </mule>
